@@ -1,0 +1,47 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, 40px);
+  grid-template-rows: repeat(10, 40px);
+  grid-gap: 2px;
+}
+
+.cell {
+  width: 40px;
+  height: 40px;
+  background-color: #add8e6;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}
+
+.cell.ship {
+  background-color: #4caf50;
+}
+
+.cell.hit {
+  background-color: red;
+}
+
+.cell.miss {
+  background-color: #f0f0f0;
+}
+
+.ship-selector {
+  margin-bottom: 10px;
+}
+
+.ship-selector button {
+  margin-right: 10px;
+}
+
+h2 {
+  text-align: center;
+}
+
+.status, .statistics {
+  text-align: center;
+}
+
+.boards {
+  display: flex;
+  justify-content: space-between;
+}

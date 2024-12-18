@@ -1,38 +1,61 @@
-.App {
+/* styles.css */
+.game {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.status {
+  font-size: 1.5em;
+  margin-bottom: 20px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.boards {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
+}
+
+.board-container {
+  margin: 20px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(10, 40px); /* Create 10 columns */
+  grid-template-rows: repeat(10, 40px); /* Create 10 rows */
+  gap: 2px;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.cell {
+  width: 40px;
+  height: 40px;
+  background-color: lightblue;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: 1px solid #ddd;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.cell.ship {
+  background-color: green;
+}
+
+.cell.hit {
+  background-color: red;
+}
+
+.cell.miss {
+  background-color: blue;
+}
+
+.ship {
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.notification {
+  color: red;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-top: 20px;
 }
