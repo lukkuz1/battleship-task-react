@@ -1,6 +1,7 @@
 import React from "react";
 import Board from "./components/Board/index.js";
 import { useGameLogic } from "./hooks/gameLogic.js";
+import "./styles.css"; // Import the updated CSS
 
 const App = () => {
   const {
@@ -10,6 +11,7 @@ const App = () => {
     enemyShots,
     gameStatus,
     remainingShots,
+    aiShots, // Add aiShots to destructure
     handlePlayerShot,
     resetGame,
   } = useGameLogic();
@@ -21,13 +23,22 @@ const App = () => {
       {/* Show game status */}
       <div className="status">{gameStatus}</div>
 
-      {/* Show remaining shots */}
-      <div className="status">Remaining Shots: {remainingShots}</div>
+      {/* Show remaining shots for both player and AI */}
+      <div className="status">
+        <p>Player Remaining Shots: {remainingShots}</p>
+        <p>AI Remaining Shots: {aiShots}</p>
+      </div>
 
-      {/* Notification for out of shots */}
+      {/* Notifications for out of shots */}
       {remainingShots <= 0 && gameStatus === "Game In Progress" && (
         <div className="notification">
           <p>You've run out of shots!</p>
+        </div>
+      )}
+
+      {aiShots <= 0 && gameStatus === "Game In Progress" && (
+        <div className="notification">
+          <p>The AI has run out of shots!</p>
         </div>
       )}
 
@@ -52,6 +63,7 @@ const App = () => {
         </div>
       </div>
 
+      {/* Restart game button */}
       {gameStatus !== "Game In Progress" && (
         <button onClick={resetGame}>Restart Game</button>
       )}

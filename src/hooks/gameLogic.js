@@ -43,24 +43,27 @@ export const placeShipRandomly = (board, ship) => {
 };
 
 // Check the game status based on remaining ships and shots
-export const checkGameStatus = (playerBoard, enemyBoard, remainingShots) => {
-  const allSunk = !enemyBoard.some((row) => row.some((cell) => cell === true)); // Check if all enemy ships are sunk
-  const playerLost = remainingShots === 0 && !allSunk; // Player loses if no shots are left and all ships are not sunk
-  if (allSunk) return "You Win!"; // If all enemy ships are sunk, player wins
-  if (playerLost) return "You Lose!"; // If player has no shots left and still not won, they lose
+export const checkGameStatus = (playerBoard, enemyBoard, remainingShots, aiShots) => {
+  const allPlayerShipsSunk = !playerBoard.some((row) => row.some((cell) => cell === true));
+  const allEnemyShipsSunk = !enemyBoard.some((row) => row.some((cell) => cell === true));
+
+  if (allEnemyShipsSunk) return "You Win!"; // If all enemy ships are sunk, player wins
+  if (remainingShots === 0 || allPlayerShipsSunk) return "You Lose!"; // Player loses if no shots are left or all their ships are sunk
+  if (aiShots === 0 && !allPlayerShipsSunk) return "AI Loses!"; // AI loses if it misses all shots
 
   return "Game In Progress"; // If the game is still ongoing
 };
 
 // Custom hook for managing game logic
 export const useGameLogic = () => {
-  const initialShots = 25; // The player starts with 25 shots
+  const initialShots = 25; // Both player and AI start with 25 shots
   const [playerBoard, setPlayerBoard] = useState(initializeBoard());
   const [enemyBoard, setEnemyBoard] = useState(initializeBoard());
   const [playerShots, setPlayerShots] = useState(initializeBoard());
   const [enemyShots, setEnemyShots] = useState(initializeBoard());
   const [gameStatus, setGameStatus] = useState("Game Started");
   const [remainingShots, setRemainingShots] = useState(initialShots);
+  const [aiShots, setAIShots] = useState(initialShots); // Track AI's shots remaining
 
   useEffect(() => {
     let tempPlayerBoard = initializeBoard();
@@ -86,29 +89,36 @@ export const useGameLogic = () => {
 
     // Only decrement remaining shots if it's a miss
     if (shotResult === "miss") {
-      setRemainingShots((prevShots) => prevShots - 1); // Use the previous state value to decrement remaining shots
+      setRemainingShots((prevShots) => prevShots - 1);
     }
 
-    setGameStatus((prevStatus) =>
-      checkGameStatus(playerBoard, enemyBoard, remainingShots)
-    ); // Update game status
+    setGameStatus(checkGameStatus(playerBoard, enemyBoard, remainingShots - 1, aiShots));
 
     handleAIShoot(); // Handle AI shot after player shoots
   };
 
   const handleAIShoot = () => {
-    // AI should not have remaining shots and it should not affect player shots
     let aiShot = false;
     while (!aiShot) {
       const row = Math.floor(Math.random() * 10);
       const col = Math.floor(Math.random() * 10);
       if (playerShots[row][col] === null) {
         let newPlayerShots = [...playerShots];
-        newPlayerShots[row][col] = playerBoard[row][col] ? "hit" : "miss"; // Mark AI shot
+        const shotResult = playerBoard[row][col] ? "hit" : "miss"; // Determine AI shot result
+
+        newPlayerShots[row][col] = shotResult; // Mark AI shot
         setPlayerShots(newPlayerShots);
+
+        // Only decrement AI shots if it's a miss
+        if (shotResult === "miss") {
+          setAIShots((prevShots) => prevShots - 1);
+        }
+
         aiShot = true;
       }
     }
+
+    setGameStatus(checkGameStatus(playerBoard, enemyBoard, remainingShots, aiShots - 1));
   };
 
   const resetGame = () => {
@@ -123,8 +133,17 @@ export const useGameLogic = () => {
     setPlayerShots(initializeBoard());
     setEnemyShots(initializeBoard());
     setRemainingShots(initialShots);
+    setAIShots(initialShots); // Reset AI shots
     setGameStatus("Game Started");
   };
+
+  // Automatically restart the game when someone wins or loses
+  useEffect(() => {
+    if (gameStatus === "You Win!" || gameStatus === "You Lose!") {
+      const timer = setTimeout(resetGame, 3000); // Restart after 3 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [gameStatus]);
 
   return {
     playerBoard,
@@ -133,6 +152,7 @@ export const useGameLogic = () => {
     enemyShots,
     gameStatus,
     remainingShots,
+    aiShots,
     handlePlayerShot,
     handleAIShoot,
     resetGame,
